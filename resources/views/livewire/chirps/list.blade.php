@@ -28,6 +28,14 @@ new class extends Component {
         $this->getChirps();
     }
 
+    #[On('chirpEditCanceled')]
+    #[On('chirpUpdated')]
+    public function cancelEdit(): void
+    {
+        $this->editing = null;
+        $this->getChirps();
+    }
+
 }; ?>
 
 <div>
