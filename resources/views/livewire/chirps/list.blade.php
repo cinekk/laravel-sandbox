@@ -9,11 +9,19 @@ new class extends Component {
     public Collection $chirps;
     public ?Chirp $editing = null;
 
+    /**
+     * Mount the component
+     * @return void
+     */
     public function mount(): void
     {
         $this->getChirps();
     }
 
+    /**
+     * Get the chirps
+     * @return void
+     */
     #[On('chirpCreated')]
     public function getChirps(): void
     {
@@ -22,12 +30,21 @@ new class extends Component {
             ->get();
     }
 
+    /**
+     * Edit a chirp
+     * @param  App\Models\Chirp  $chirp
+     * @return void
+     */
     public function edit(Chirp $chirp): void
     {
         $this->editing = $chirp;
         $this->getChirps();
     }
 
+    /**
+     * Cancel the edit
+     * @return void
+     */
     #[On('chirpEditCanceled')]
     #[On('chirpUpdated')]
     public function cancelEdit(): void
@@ -36,6 +53,17 @@ new class extends Component {
         $this->getChirps();
     }
 
+    /**
+     * Delete a chirp
+     * @param  App\Models\Chirp  $chirp
+     * @return void
+     */
+    public function delete(Chirp $chirp): void
+    {
+        $this->authorize('delete', $chirp);
+        $chirp->delete();
+        $this->getChirps();
+    }
 }; ?>
 
 <div>
@@ -71,6 +99,9 @@ new class extends Component {
                                 <x-slot name="content">
                                     <x-dropdown-link wire:click="edit({{ $chirp }})">
                                         {{ __('Edit') }}
+                                    </x-dropdown-link>
+                                    <x-dropdown-link wire:click="delete({{ $chirp }})">
+                                        {{ __('Delete') }}
                                     </x-dropdown-link>
                                 </x-slot>
                             </x-dropdown>
