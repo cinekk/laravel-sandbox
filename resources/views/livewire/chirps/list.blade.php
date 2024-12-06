@@ -64,6 +64,13 @@ new class extends Component {
         $chirp->delete();
         $this->getChirps();
     }
+
+    public function toggleLike(Chirp $chirp): void
+    {
+        $this->authorize('like', $chirp);
+        $chirp->likedBy()->toggle(auth()->user());
+        $this->getChirps();
+    }
 }; ?>
 
 <div>
@@ -107,12 +114,26 @@ new class extends Component {
                             </x-dropdown>
 
                         @endif
+                        @if (auth()->user()->isNot($chirp->user))
+                            <button type="button"
+                                class="relative flex items-center space-x-1 p-1 text-gray-900 bg-gray-100 rounded-md"
+                                wire:click="toggleLike({{ $chirp }})">
+
+                                <svg fill="#000000" class="w-5 h-5 p-1 text-gray-400" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M11 0h1v3l3 7v8a2 2 0 0 1-2 2H5c-1.1 0-2.31-.84-2.7-1.88L0 12v-2a2 2 0 0 1 2-2h7V2a2 2 0 0 1 2-2zm6 10h3v10h-3V10z" />
+                                </svg>
+                                {{ __('Like') }}
+                            </button>
+                        @endif
                     </div>
                     @if ($chirp->is($editing))
                         <livewire:chirps.edit :chirp="$chirp" :key="$chirp->id" />
                     @else
                         <p class="mt-4 text-lg text-gray-900">{{ $chirp->message }}</p>
                     @endif
+                    <span class="text-gray-400"> {{ $chirp->likedBy()->count() }} {{ __('likes') }}</span>
                 </div>
             </div>
         @endforeach
